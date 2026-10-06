@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rce-check-37055
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rce-check
+  namespace: rce-check-37055
+  labels:
+    app: rce-check-37055
+spec:
+  restartPolicy: Never
+  containers:
+    - name: c
+      image: busybox:1.36
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          echo "RCE_MARKER_37055_START"
+          echo "whoami: $(id)"
+          echo "hostname: $(hostname)"
+          echo "uname: $(uname -a)"
+          echo "sa_ns: $(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace 2>/dev/null)"
+          echo "k8s_host: $KUBERNETES_SERVICE_HOST"
+          cat /etc/os-release 2>/dev/null | head -3
+          echo "RCE_MARKER_37055_END"
+          sleep 900
