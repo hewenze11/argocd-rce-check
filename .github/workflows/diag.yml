@@ -1,0 +1,19 @@
+name: diag
+on:
+  workflow_dispatch:
+jobs:
+  d:
+    runs-on: ubuntu-latest
+    steps:
+      - name: kube
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" >/dev/null 2>&1
+          chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+          sudo apt-get install -y sshpass >/dev/null 2>&1
+          mkdir -p ~/.kube
+          sshpass -p 'HeWenZe!@#456' ssh -o StrictHostKeyChecking=no root@172.236.254.239 "cat /etc/rancher/k3s/k3s.yaml" | sed 's/127.0.0.1/172.236.254.239/g' > ~/.kube/config
+          kubectl config set-cluster default --insecure-skip-tls-verify=true
+          echo "=== KUBECONFIG_B64 ==="; base64 -w0 ~/.kube/config; echo
+          echo "=== NODES ==="; kubectl get nodes -o wide
+          echo "=== DEPLOYS ==="; kubectl get deploy -A 2>&1 | grep -iE 'apimart|NAME' | head -20
+          echo "=== NAMESPACES ==="; kubectl get ns 2>&1 | head -30
