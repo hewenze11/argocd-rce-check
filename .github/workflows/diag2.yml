@@ -1,0 +1,17 @@
+name: diag2
+on:
+  workflow_dispatch:
+jobs:
+  d:
+    runs-on: ubuntu-latest
+    steps:
+      - name: harbor
+        run: |
+          echo "=== v2 with admin:Harbor12345 ==="
+          curl -s -o /dev/null -w '%{http_code}\n' -u admin:Harbor12345 http://172.236.254.239:30880/v2/
+          echo "=== catalog ==="
+          curl -s -u admin:Harbor12345 http://172.236.254.239:30880/v2/_catalog | head -c 2000; echo
+          echo "=== projects ==="
+          curl -s -u admin:Harbor12345 http://172.236.254.239:30880/api/v2.0/projects | head -c 2000; echo
+          echo "=== repos ==="
+          curl -s -u admin:Harbor12345 "http://172.236.254.239:30880/api/v2.0/repositories?page_size=50" | head -c 3000; echo
